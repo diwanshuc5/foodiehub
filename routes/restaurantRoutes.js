@@ -48,4 +48,40 @@ router.get("/restaurants/:id", async (req, res) => {
     }
 });
 
+router.put("/restaurants/:id", async (req, res) => {
+    try {
+        const { name, cuisine, location, rating } = req.body;
+
+        const updatedRestaurant = await Restaurant.findByIdAndUpdate(
+            req.params.id,
+            { name, cuisine, location, rating },
+            { new: true, runValidators: true } // Returns the updated record
+        );
+
+        if (!updatedRestaurant) {
+            return res.status(404).json({ message: "Restaurant not found" });
+        }
+
+        res.status(200).json(updatedRestaurant);
+    } catch (error) {
+        console.error("Error updating restaurant:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
+router.delete("/restaurants/:id", async (req, res) => {
+    try {
+        const deletedRestaurant = await Restaurant.findByIdAndDelete(req.params.id);
+
+        if (!deletedRestaurant) {
+            return res.status(404).json({ message: "Restaurant not found" });
+        }
+
+        res.status(200).json({ message: "Restaurant deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting restaurant:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
+
 module.exports = router;
