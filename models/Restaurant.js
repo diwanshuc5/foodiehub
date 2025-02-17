@@ -23,6 +23,7 @@ const restaurantSchema = new mongoose.Schema({
             ref: "Review",
         },
     ],
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true } // Associate with a user
 });
 
 module.exports = mongoose.model("Restaurant", restaurantSchema);
