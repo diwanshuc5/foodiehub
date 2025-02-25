@@ -27,12 +27,34 @@ router.post("/restaurants", authMiddleware, async (req, res) => {
 
 // Get all restaurants
 router.get("/restaurants", async (req, res) => {
+    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10
+
     try {
-        const restaurants = await Restaurant.find();
-        res.status(200).json(restaurants);
+        // Convert query parameters to integers
+        const pageNumber = parseInt(page, 10);
+        const pageLimit = parseInt(limit, 10);
+
+        // Calculate the skip value based on the page number and limit
+        const skip = (pageNumber - 1) * pageLimit;
+
+        // Fetch the restaurants with pagination
+        const restaurants = await Restaurant.find()
+            .skip(skip)
+            .limit(pageLimit);
+
+        // Count the total number of restaurants for pagination info
+        const totalCount = await Restaurant.countDocuments();
+
+        // Send the response with restaurants and pagination info
+        res.status(200).json({
+            currentPage: pageNumber,
+            totalPages: Math.ceil(totalCount / pageLimit),
+            totalCount,
+            restaurants
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server Error" });
+        console.error("Error fetching restaurants:", error);
+        res.status(500).json({ message: "Server error" });
     }
 });
 
