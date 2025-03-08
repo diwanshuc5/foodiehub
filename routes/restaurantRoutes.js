@@ -27,25 +27,46 @@ router.post("/restaurants", authMiddleware, async (req, res) => {
 
 // Get all restaurants
 router.get("/restaurants", async (req, res) => {
-    const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10
+    const { page = 1, limit = 10, search, cuisine, location, sort } = req.query;
 
     try {
-        // Convert query parameters to integers
         const pageNumber = parseInt(page, 10);
         const pageLimit = parseInt(limit, 10);
-
-        // Calculate the skip value based on the page number and limit
         const skip = (pageNumber - 1) * pageLimit;
 
-        // Fetch the restaurants with pagination
-        const restaurants = await Restaurant.find()
+        let query = {}; // Empty query (will be updated with filters)
+
+        // Search by restaurant name (case-insensitive)
+        if (search) {
+            query.name = { $regex: search, $options: "i" }; // "i" makes it case insensitive
+        }
+
+        // Filter by cuisine
+        if (cuisine) {
+            query.cuisine = cuisine;
+        }
+
+        // Filter by location
+        if (location) {
+            query.location = location;
+        }
+
+        // Sorting (default is by name)
+        let sortOption = { name: 1 }; // Sort by name (ascending)
+        if (sort === "rating") {
+            sortOption = { rating: -1 }; // Sort by rating (highest first)
+        }
+
+        // Fetch the restaurants with filtering, searching, sorting, and pagination
+        const restaurants = await Restaurant.find(query)
+            .sort(sortOption)
             .skip(skip)
             .limit(pageLimit);
 
-        // Count the total number of restaurants for pagination info
-        const totalCount = await Restaurant.countDocuments();
+        // Count the total restaurants matching the filters
+        const totalCount = await Restaurant.countDocuments(query);
 
-        // Send the response with restaurants and pagination info
+        // Send response
         res.status(200).json({
             currentPage: pageNumber,
             totalPages: Math.ceil(totalCount / pageLimit),

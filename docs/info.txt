@@ -1,0 +1,14 @@
+testing users:
+{
+    "email": "john@example.com",
+    "password": "password123"
+}
+
+{
+    "email": "billball@example.com",
+    "password": "password123"
+}
+
+http://localhost:5000/auth/login
+http://localhost:5000/users/favorites
+http://localhost:5000/api/restaurants/
