@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const restaurantRoutes = require("./routes/restaurantRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -16,6 +17,7 @@ app.use(express.json()); // Enable JSON request handling
 app.use("/api", restaurantRoutes); // All restaurant routes will start with /api
 app.use("/auth", authRoutes); // All auth routes will start with /auth
 app.use("/users", userRoutes);  // All user routes will start with /users
+app.use("/reviews", reviewRoutes); // All review routes will start with /reviews
 
 app.get("/", (req, res) => {
     res.send("FoodieHub Server is Running...");
