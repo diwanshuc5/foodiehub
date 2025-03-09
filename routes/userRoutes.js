@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../models/User");
 const Restaurant = require("../models/Restaurant");
 const authMiddleware = require("../middleware/authMiddleware"); // Protect routes
+const bcrypt = require("bcryptjs");
 
 // Add to Favorites
 router.post("/favorites/:restaurantId", authMiddleware, async (req, res) => {
@@ -64,5 +65,30 @@ router.get("/favorites", authMiddleware, async (req, res) => {
     }
 });
 
+
+// Update User Profile
+router.put("/profile", authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        const { name, email, password } = req.body;
+
+        if (name) user.name = name;
+        if (email) user.email = email;
+
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
+        }
+
+        await user.save();
+        res.status(200).json({ message: "Profile updated successfully" });
+
+    } catch (err) {
+        console.error("Error updating profile:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
 
 module.exports = router;

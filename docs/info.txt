@@ -1,7 +1,8 @@
 testing users:
 {
-    "email": "john@example.com",
-    "password": "password123"
+    "name": "James Doe"
+    "email": "james@example.com",
+    "password": "password1234"
 }
 
 {
